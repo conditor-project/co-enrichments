@@ -1,0 +1,32 @@
+{
+  "update": [
+    {
+      "label": "Should add enrichments into an object",
+      "arguments": {
+        "docObject": {
+          "value": "value1",
+          "id": "1",
+          "text": "a sample text",
+          "collection": ["item1", "item2", "item3"]
+        }
+      },
+      "result": {
+        "equal": "{\"value\":\"value1\",\"id\":\"1\",\"text\":\"a sample text\",\"collection\":[\"item1\",\"item2\",\"item3\"],\"enrichments\":{\"test1\":true}}"
+      }
+    },
+    {
+      "label": "Should not add enrichments into an object",
+      "arguments": {
+        "docObject": {
+          "value": "fail",
+          "id": "fail",
+          "text": "a sample text",
+          "collection": ["item4", "item5", "item6"]
+        }
+      },
+      "result": {
+        "equal": "{\"value\":\"fail\",\"id\":\"fail\",\"text\":\"a sample text\",\"collection\":[\"item4\",\"item5\",\"item6\"]}"
+      }
+    }
+  ]
+}

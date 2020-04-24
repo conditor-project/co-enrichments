@@ -1,0 +1,7 @@
+[
+  {
+    "selectors": { "id": ["1"], "value": ["value1"] },
+    "value": true,
+    "target": { "from": "parent", "selector": "", "key": "enrichments.test1" }
+  }
+]
