@@ -56,43 +56,43 @@ Chaque enrichissement est représenté par un objet JSON sous la forme :
 
 Explications :
 
-- selectors : Liste des différentes clés à tester, avec un sélecteur par clé et sa valeur associé.(1) 
-- value : La valeur de l'enrichissement (peut être un string, un int, un array ou un object)
+- selectors : Liste des différentes sélecteurs (clé) à tester sa valeur associée (valeur).(1) 
+- value : La valeur de l'enrichissement (peut être un string, un int, un array, un object, etc)
 - target : L'endroit ou l'enrichissement sera ajouté
     - from : Point de départ. 4 choix possibles
         - root : racine de l'objet
-        - target : l'objet ciblé
-        - parent : le parent de l'objet ciblé
-        - item : chaque item ayant matché lors du test (utile lorsqu'un sélectors est un tableau)
-    - selector : un sélector permettant d'afiner le ciblage
-    - key : la clé où sera ajouté l'enrchissement (possibilité de créer des nouvelles propriétées)
-- erase : [true|**false**] Remplace l'ancienne valeur présente à l'endroit où l'enrichissement sera ajouté (default value : false)
+        - target : l'objet ciblé par le(s) sélecteur(s)
+        - parent : le parent de l'objet ciblé par le(s) sélecteur(s)
+        - item : chaque item ayant matché le sélecteur (utile lorsqu'un sélecteur renvois un tableau)
+    - selector : un sélector permettant d'affiner le ciblage (la donnée doit exister)
+    - key : la clé où sera stocké l'enrchissement (possibilité de créer des nouvelles propriétées)
+- erase : [true|**false**] Si besoin, remplace l'ancienne valeur présente à l'endroit où l'enrichissement sera ajouté (default value : false)
 
 (1) Notes :
 
-Le sélecteur est sous la forme "clé.sousClé.sousSousClé". Exemples de selectors dans Conditor :
+Le sélecteur est sous la forme "property.subProperty.subSubProperty". Exemples de selectors dans Conditor :
 
     - "" : renverra l'objet JSON complet
-    - "authors": renverra un tableau d'objet JSON (ou chaque item est un auteur)
-    - "authors.halId" : renverra un tableau de string (ou chaque item est l'idHal d'un auteur)
-    - "authors.affiliations.address" : renverra un tableau de string (ou chaque item est l'adresse de chaque affiliations de chaque auteurs)
+    - "authors": renverra un tableau d'objet JSON (où chaque item est un auteur)
+    - "authors.halId" : renverra un tableau de string (où chaque item est l'idHal d'un auteur)
+    - "authors.affiliations.address" : renverra un tableau de string (où chaque item est l'adresse de chaque affiliations de chaque auteurs)
 
-Plusieurs clés renseignés dans "sélectors" équivaut à faire un ET logique. Un OU logique sera représenté par 2 (ou plus) enrichissements.
+Plusieurs clés renseignées dans "sélectors" équivaut à faire un ET logique. Un OU logique sera représenté par (au moins) deux enrichissements.
 
 ```js
 // ET logique
 [
   {
     "selectors": {
-      "authors.myPropertie": [
-        "myValue"
+      "property1.subProperty": [
+        "value1"
       ],
-      "authors.anotherProperty": [
-        "anotherValue"
+      "property2": [
+        "value2"
       ]
     },
     "value": [
-      "enrichmentValue"
+      "myEnrichmentValue"
     ],
     "target": {
       "from": "root",
@@ -106,12 +106,12 @@ Plusieurs clés renseignés dans "sélectors" équivaut à faire un ET logique. 
 [
   {
     "selectors": {
-      "authors.myPropertie": [
-        "myValue"
+      "property1.subProperty": [
+        "value1"
       ]
     },
     "value": [
-      "enrichmentValue"
+      "myEnrichmentValue"
     ],
     "target": {
       "from": "root",
@@ -120,12 +120,12 @@ Plusieurs clés renseignés dans "sélectors" équivaut à faire un ET logique. 
     }
   }, {
     "selectors": {
-      "authors.anotherPropertie": [
-        "anotherValue"
+      "property2": [
+        "value2"
       ]
     },
     "value": [
-      "enrichmentValue"
+      "myEnrichmentValue"
     ],
     "target": {
       "from": "root",
@@ -136,7 +136,7 @@ Plusieurs clés renseignés dans "sélectors" équivaut à faire un ET logique. 
 ]
 ```
 
-Toutes les valeurs recherchées stockées dans un tableau JSON. S'il contient plusieurs valeurss alors l'objet en possédant au moins une sera retourné.
+Toutes les valeurs associées à un sélecteur sont stockées dans un tableau JSON. S'il contient plusieurs valeurs alors l'objet en possédant au moins une sera retourné. 
 
 ```js
 /*
@@ -151,7 +151,47 @@ Toutes les valeurs recherchées stockées dans un tableau JSON. S'il contient pl
       ]
     },
     "value": [
-      "enrichmentValue"
+      "myEnrichmentValue"
+    ],
+    "target": {
+      "from": "root",
+      "selector": "",
+      "key": "enrichments.myKey"
+    }
+  }
+]
+
+/*
+ * Si authors.affiliations.address "contient au moins" "myAddress1" "myAddress2"
+ * Alors l'enrchissement sera ajouté à l'objet
+ */
+[
+  {
+    "selectors": {
+      "authors.affiliations.address": ["myAddress1", "myAddress2"]
+    },
+    "value": [
+      "myEnrichmentValue"
+    ],
+    "target": {
+      "from": "root",
+      "selector": "",
+      "key": "enrichments.myKey"
+    }
+  }
+]
+
+/*
+ * Si authors.affiliations "contient au moins" [{"address": "myAddress1"}] et [{"address": "myAddress2"}]
+ * Alors l'enrchissement sera ajouté à l'objet
+ */
+[
+  {
+    "selectors": {
+      "authors.affiliations": [[{"address": "myAddress1"}, {"address": "myAddress2"}]]
+    },
+    "value": [
+      "myEnrichmentValue"
     ],
     "target": {
       "from": "root",
