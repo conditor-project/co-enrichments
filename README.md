@@ -65,114 +65,170 @@ Chaque enrichissement est représenté par un objet JSON sous la forme :
 
 Explications pour chaque propriété d'un enrichissement :
 
-- [Object] selectors = Les clés représentes les différents sélecteurs à tester, avec pour chacun sa valeur associée.
-- [Object|Array|String|Int|Boolean] value = La valeur de l'enrichissement
-- [Object] target = L'endroit où l'enrichissement sera ajouté
-    - [String] from = Point de départ de la sélection (4 choix possibles) :
-        - root = racine de l'objet
-        - target = l'objet ciblé par le(s) sélecteur(s)
-        - parent = le parent de l'objet ciblé par le(s) sélecteur(s)
-        - item = chaque item ayant matché le sélecteur (utile lorsqu'un sélecteur renvois un tableau)
-    - [String] selector =  Un sélector permettant d'affiner le ciblage (la donnée doit exister)
-    - [String] key = La clé où sera stocké l'enrchissement (possibilité de créer des nouvelles propriétées)
-- [Boolean] erase : La nouvelle valeur remplacera l'ancienne (en cas de conflit). Par défaut à : false.
+    - [Object] selectors = Les clés représentent les différents sélecteurs, avec pour chacun la/les valeur(s) associée(s).
+    - [Object|Array|String|Int|Boolean] value = La valeur de l'enrichissement.
+    - [Object] target = L'endroit où l'enrichissement sera ajouté.
+        - [String] from = Point de départ de la sélection (4 choix possibles) :
+            - root = racine de l'objet
+            - target = l'objet ciblé par le(s) sélecteur(s)
+            - parent = le parent de l'objet ciblé par le(s) sélecteur(s)
+            - item = chaque item ayant matché le(s) sélecteur(s) (utile lorsqu'un sélecteur renvois un tableau)
+        - [String] selector =  Un sélector permettant d'affiner le ciblage (la donnée ciblée doit exister)
+        - [String] key = La clé où sera stocké l'enrchissement (possibilité de créer des nouvelles propriétées)
+    - [Boolean] erase : La nouvelle valeur remplacera l'ancienne en cas de conflit (donnée ciblée déjà existante). Par défaut à : false.
+
+Rappel : Les propriétés de "selectors" et "target.selector" doivent obligatoirement contenir un sélecteur.
 
 ### Les sélecteurs ###
 
-Un sélecteur est sous la forme "property.subProperty.subSubProperty". Exemples de selectors (dans Conditor) :
+La structure de "selectors" est la suivante :
+
+```js
+/*
+ * Exemple avec un seul sélecteur
+ */
+{
+  "selectors": {
+    "mySelector": [...]
+  },
+  ...
+}
+/*
+ * Exemple avec plusieurs sélecteurs
+ */
+{
+  "selectors": {
+    "mySelector1": [...],
+    "mySelector2": [...],
+    "mySelector3": [...],
+    ...
+  },
+  ...
+}
+```
+
+Si un enrichissement à plusieurs "selectors", le module n'ajoutera l'enrichissement qu'aux objets respectant **tous** les critères.
+
+Chaque sélecteur est sous la forme "property.subProperty.subSubProperty" (ou ""). Il permet au module de sélectionner n'importe quelle valeur **existante** d'un objet JSON.
+
+Exemples de selecteur (pour un "docObject" Conditor) :
 
     - "" : renverra un objet JSON (le "docObjet" complet)
     - "authors": renverra un tableau d'objet JSON (où chaque item est un auteur)
     - "authors.halId" : renverra un tableau de string (où chaque item est l'idHal d'un auteur)
-    - "authors.affiliations.address" : renverra un tableau de string (où chaque item est l'adresse de chaque affiliations de chaque auteurExempless)
+    - "authors.affiliations.address" : renverra un tableau de string (où chaque item est l'adresse de chaque affiliations de chaque auteur)
 
-Plusieurs clés renseignées dans "sélectors" équivaut à faire un ET logique. Un OU logique sera représenté par (au moins) deux enrichissements.
-
-```js
-// ET logique
-[
-  {
-    "selectors": {
-      "property1.subProperty": [
-        "value1"
-      ],
-      "property2": [
-        "value2"
-      ]
-    },
-    "value": [
-      "myEnrichmentValue"
-    ],
-    "target": {
-      "from": "root",
-      "selector": "",
-      "key": "enrichments.myKey"
-    }
-  }
-]
-
-// OU logique
-[
-  {
-    "selectors": {
-      "property1.subProperty": [
-        "value1"
-      ]
-    },
-    "value": [
-      "myEnrichmentValue"
-    ],
-    "target": {
-      "from": "root",
-      "selector": "",
-      "key": "enrichments.myKey"
-    }
-  }, {
-    "selectors": {
-      "property2": [
-        "value2"
-      ]
-    },
-    "value": [
-      "myEnrichmentValue"
-    ],
-    "target": {
-      "from": "root",
-      "selector": "",
-      "key": "enrichments.myKey"
-    }
-  }
-]
-```
-
-Toutes les valeurs associées à un sélecteur sont stockées dans un tableau JSON. S'il contient plusieurs valeurs alors l'objet en possédant au moins une sera retourné. 
+Toutes les valeurs associées aux "selectors" doivent être stockées dans un tableau JSON, comme suit :
 
 ```js
 /*
- * Si authors.id = "id1" ou authors.id = "id2"
- * Alors l'enrchissement sera ajouté à l'objet
+ * Exemple avec une seule valeur
+ */
+{
+  "mySelector": [ true ]
+}
+/*
+ * Exemple avec plusieurs valeurs 
+ */
+{
+  "mySelector": [
+    "value1",
+    "value2",
+    "value3",
+    "value4",
+    ...
+  ]
+}
+/*
+ * Exemple avec plusieurs valeurs de n'importe quel type
+ */
+{
+  "mySelector": [
+    "value1",
+    2,
+    true,
+    { "value": 1 },
+    [ 1, 2, 3, 4, 5 ]
+    [ {...}, 1, "2", true]
+    ...
+  ]
+}
+```
+
+Pour chaque sélecteurs, le module va comparer les valeurs ciblées par les différents sélecteurs et aux valeurs attendues puis ajouter l'enrichissement à tout objet ayant **au moins** une des ces valeurs.
+
+##### Exemples #####
+
+Je veux ajouter un enrichissement aux objets ayant :
+
+- comme "source" : "mySource" **ET** comme "publicationDate" : "myPublicationDate"
+
+```js
+/*
+ * Je fais donc un seul enrichissement avec deux sélecteurs dans "selectors"
  */
 [
   {
     "selectors": {
-      "authors.id": [
-        "id1", "id2"
+      "source": [
+        "mySource"
+      ],
+      "publicationDate": [
+        "myPublicationDate"
       ]
     },
     "value": [
       "myEnrichmentValue"
     ],
-    "target": {
-      "from": "root",
-      "selector": "",
-      "key": "enrichments.myKey"
-    }
+    "target": { ... }
   }
 ]
 
+```
+
+Je veux ajouter un enrichissement aux objets ayant :
+
+- comme "source" : "mySource" **OU** comme "publicationDate" : "myPublicationDate"
+
+```js
 /*
- * Si authors.affiliations.address "contient au moins" "myAddress1" "myAddress2"
- * Alors l'enrchissement sera ajouté à l'objet
+ * Je fais donc deux enrichissements avec un seul sélecteur dans "selectors"
+ */
+[
+  {
+    "selectors": {
+      "source": [
+        "mySource"
+      ]
+    },
+    "value": [
+      "myEnrichmentValue"
+    ],
+    "target": { ... }
+  },
+  {
+    "selectors": {
+      "publicationDate": [
+        "myPublicationDate"
+      ]
+    },
+    "value": [
+      "myEnrichmentValue"
+    ],
+    "target": { ... }
+  }
+]
+```
+
+Je veux ajouter un enrichissement aux documents ayant :
+
+- Un auteur avec une affiliation avec l'adresse : "myAddress1" **OU** "myAddress2"
+
+
+```js
+/*
+ * Je mets donc la valeur : "myAddress1" et "myAddress2"
+ * dans le sélecteur : "authors.affiliations"
  */
 [
   {
@@ -182,17 +238,19 @@ Toutes les valeurs associées à un sélecteur sont stockées dans un tableau JS
     "value": [
       "myEnrichmentValue"
     ],
-    "target": {
-      "from": "root",
-      "selector": "",
-      "key": "enrichments.myKey"
-    }
+    "target": { ... }
   }
 ]
+```
 
+Je veux ajouter un enrichissement aux documents ayant :
+
+- Un auteur avec une affiliation avec l'adresse : "myAddress1" **ET** "myAddress2"
+
+```js
 /*
- * Si authors.affiliations "contient au moins" [{"address": "myAddress1"}] et [{"address": "myAddress2"}]
- * Alors l'enrchissement sera ajouté à l'objet
+ * Je mets donc la valeur : [{"address": "myAddress1"}, {"address": "myAddress2"}]
+ * dans le sélecteur : "authors.affiliations"
  */
 [
   {
@@ -202,11 +260,7 @@ Toutes les valeurs associées à un sélecteur sont stockées dans un tableau JS
     "value": [
       "myEnrichmentValue"
     ],
-    "target": {
-      "from": "root",
-      "selector": "",
-      "key": "enrichments.myKey"
-    }
+    "target": { ... }
   }
 ]
 ```
