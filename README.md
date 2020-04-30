@@ -65,7 +65,7 @@ Chaque enrichissement est représenté par un objet JSON sous la forme :
 
 Explications pour chaque propriété d'un enrichissement :
 
-- [Object] selectors = Les clés représentes les différents sélecteurs à tester, avec pour chacun sa valeur associée.(1) 
+- [Object] selectors = Les clés représentes les différents sélecteurs à tester, avec pour chacun sa valeur associée.
 - [Object|Array|String|Int|Boolean] value = La valeur de l'enrichissement
 - [Object] target = L'endroit où l'enrichissement sera ajouté
     - [String] from = Point de départ de la sélection (4 choix possibles) :
@@ -77,7 +77,7 @@ Explications pour chaque propriété d'un enrichissement :
     - [String] key = La clé où sera stocké l'enrchissement (possibilité de créer des nouvelles propriétées)
 - [Boolean] erase : La nouvelle valeur remplacera l'ancienne (en cas de conflit). Par défaut à : false.
 
-(1) Notes :
+### Les sélecteurs ###
 
 Un sélecteur est sous la forme "property.subProperty.subSubProperty". Exemples de selectors (dans Conditor) :
 
@@ -209,28 +209,4 @@ Toutes les valeurs associées à un sélecteur sont stockées dans un tableau JS
     }
   }
 ]
-```
-
-## Exemple ##
-
-Pour un chaque document dans Conditor, je souhaite ajouter l'idRef "https://www.idref.fr/myIdRef" aux auteurs ayant l'idHal "myIdHal".
-
-L'objet JSON représentant cet enrichissement sera donc de la forme suivante :
-
-```json
-{
-  "selectors": {
-    "authors.idHal": [
-      "myIdHal"
-    ]
-  },
-  "value": [
-    "https://www.idref.fr/myIdRef"
-  ],
-  "target": {
-    "from": "parent",
-    "selector": "",
-    "key": "idRef"
-  }
-}
 ```
