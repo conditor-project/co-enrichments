@@ -35,9 +35,7 @@ outStream.on("close", function() {
 
 jsonStream.on("data", ({ key, value }) => {
   if (typeof value === "object") {
-    console.log(value.authors);
     return business.doTheJob(value, function() {
-      console.log(value.authors);
       return outStream.write(JSON.stringify(value) + ",\n", err => {
         if (err) throw err;
       });
