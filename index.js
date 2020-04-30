@@ -7,6 +7,7 @@
 const Manager = require("./lib/manager.js"),
   conf = require("./conf.json"),
   fs = require("fs"),
+  path = require("path"),
   async = require("async"),
   StreamArray = require("stream-json/streamers/StreamArray"),
   util = require("util");
@@ -24,7 +25,7 @@ business.doTheJob = function(docObject, cb) {
       jsonStream.on("end", () => {
         return callback();
       });
-      return fs.createReadStream(item).pipe(jsonStream.input);
+      return fs.createReadStream(path.resolve(__dirname, item)).pipe(jsonStream.input);
     },
     function(err) {
       return cb();
