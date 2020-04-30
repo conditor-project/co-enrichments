@@ -22,6 +22,8 @@ Le répertoire datasets/ permet de centraliser les différents fichiers.
 
 ## Enrichissements ##
 
+### Structures ###
+
 Un fichier d'enrichissements n'est rien d'autre qu'un tableau JSON regroupant un liste d'enrichissements.
 
 ```json
@@ -54,28 +56,35 @@ Chaque enrichissement est représenté par un objet JSON sous la forme :
 }
 ```
 
-Explications :
+### Exemple ###
 
-- selectors : Liste des différentes sélecteurs (clé) à tester sa valeur associée (valeur).(1) 
-- value : La valeur de l'enrichissement (peut être un string, un int, un array, un object, etc)
-- target : L'endroit ou l'enrichissement sera ajouté
-    - from : Point de départ. 4 choix possibles
-        - root : racine de l'objet
-        - target : l'objet ciblé par le(s) sélecteur(s)
-        - parent : le parent de l'objet ciblé par le(s) sélecteur(s)
-        - item : chaque item ayant matché le sélecteur (utile lorsqu'un sélecteur renvois un tableau)
-    - selector : un sélector permettant d'affiner le ciblage (la donnée doit exister)
-    - key : la clé où sera stocké l'enrchissement (possibilité de créer des nouvelles propriétées)
-- erase : [true|**false**] Si besoin, remplace l'ancienne valeur présente à l'endroit où l'enrichissement sera ajouté (default value : false)
+![Enrichments](doc/enrichments.png "Enrichments")
+
+
+### Propriétés d'un enrichissement ###
+
+Explications pour chaque propriété d'un enrichissement :
+
+- [Object] selectors = Les clés représentes les différents sélecteurs à tester, avec pour chacun sa valeur associée.(1) 
+- [Object|Array|String|Int|Boolean] value = La valeur de l'enrichissement
+- [Object] target = L'endroit où l'enrichissement sera ajouté
+    - [String] from = Point de départ de la sélection (4 choix possibles) :
+        - root = racine de l'objet
+        - target = l'objet ciblé par le(s) sélecteur(s)
+        - parent = le parent de l'objet ciblé par le(s) sélecteur(s)
+        - item = chaque item ayant matché le sélecteur (utile lorsqu'un sélecteur renvois un tableau)
+    - [String] selector =  Un sélector permettant d'affiner le ciblage (la donnée doit exister)
+    - [String] key = La clé où sera stocké l'enrchissement (possibilité de créer des nouvelles propriétées)
+- [Boolean] erase : La nouvelle valeur remplacera l'ancienne (en cas de conflit). Par défaut à : false.
 
 (1) Notes :
 
-Le sélecteur est sous la forme "property.subProperty.subSubProperty". Exemples de selectors dans Conditor :
+Un sélecteur est sous la forme "property.subProperty.subSubProperty". Exemples de selectors (dans Conditor) :
 
-    - "" : renverra l'objet JSON complet
+    - "" : renverra un objet JSON (le "docObjet" complet)
     - "authors": renverra un tableau d'objet JSON (où chaque item est un auteur)
     - "authors.halId" : renverra un tableau de string (où chaque item est l'idHal d'un auteur)
-    - "authors.affiliations.address" : renverra un tableau de string (où chaque item est l'adresse de chaque affiliations de chaque auteurs)
+    - "authors.affiliations.address" : renverra un tableau de string (où chaque item est l'adresse de chaque affiliations de chaque auteurExempless)
 
 Plusieurs clés renseignées dans "sélectors" équivaut à faire un ET logique. Un OU logique sera représenté par (au moins) deux enrichissements.
 
