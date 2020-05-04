@@ -9,8 +9,7 @@ const Manager = require("./lib/manager.js"),
   fs = require("fs"),
   path = require("path"),
   async = require("async"),
-  StreamArray = require("stream-json/streamers/StreamArray"),
-  util = require("util");
+  StreamArray = require("stream-json/streamers/StreamArray");
 
 const business = {};
 
