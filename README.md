@@ -72,7 +72,7 @@ Explications pour chaque propriété d'un enrichissement :
             - root = racine de l'objet
             - target = l'objet ciblé par le(s) sélecteur(s)
             - parent = le parent de l'objet ciblé par le(s) sélecteur(s)
-            - item = chaque item ayant matché le(s) sélecteur(s) (utile lorsqu'un sélecteur renvois un tableau)
+            - item = chaque item ayant matché le(s) sélecteur(s) (utile lorsqu'un sélecteur "match" plusieurs items d'un tableau)
         - [String] selector =  Un sélector permettant d'affiner le ciblage (la donnée ciblée doit exister)
         - [String] key = La clé où sera stocké l'enrchissement (possibilité de créer des nouvelles propriétées)
     - [Boolean] erase : La nouvelle valeur remplacera l'ancienne en cas de conflit (donnée ciblée déjà existante). Par défaut à : false.
