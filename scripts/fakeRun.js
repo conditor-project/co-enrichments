@@ -29,14 +29,14 @@ try {
 const jsonStream = StreamArray.withParser(),
   outStream = fs.createWriteStream(program.output, { flags: "a" });
 
-outStream.on("close", function() {
+outStream.on("close", function () {
   console.log("finished.");
 });
 
 jsonStream.on("data", ({ key, value }) => {
   if (typeof value === "object") {
-    return business.doTheJob(value, function() {
-      return outStream.write(JSON.stringify(value) + ",\n", err => {
+    return business.doTheJob(value, function () {
+      return outStream.write(JSON.stringify(value) + ",\n", (err) => {
         if (err) throw err;
       });
     });

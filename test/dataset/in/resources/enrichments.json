@@ -1,7 +1,56 @@
 [
   {
-    "selectors": { "id": ["1"], "value": ["value1"] },
+    "selectors": {
+      "id": [
+        "parent"
+      ]
+    },
     "value": true,
-    "target": { "from": "parent", "selector": "", "key": "enrichments.test1" }
+    "target": {
+      "from": "parent",
+      "selector": "",
+      "key": "enrichments.parent"
+    }
+  },
+  {
+    "selectors": {
+      "items.value": [
+        "item"
+      ]
+    },
+    "value": true,
+    "target": {
+      "from": "item",
+      "selector": "",
+      "key": "enrichments"
+    }
+  },
+  {
+    "selectors": {
+      "target": [
+        {
+          "key": "test"
+        }
+      ]
+    },
+    "value": true,
+    "target": {
+      "from": "target",
+      "selector": "",
+      "key": "enrichments.target"
+    }
+  },
+  {
+    "selectors": {
+      "id": [
+        "root"
+      ]
+    },
+    "value": true,
+    "target": {
+      "from": "root",
+      "selector": "",
+      "key": "enrichments.root"
+    }
   }
 ]

@@ -1,31 +1,72 @@
 {
   "update": [
     {
-      "label": "Should add enrichments into an object",
+      "label": "Should add enrichments into an object (parent)",
       "arguments": {
         "docObject": {
-          "value": "value1",
-          "id": "1",
-          "text": "a sample text",
-          "collection": ["item1", "item2", "item3"]
+          "id": "parent"
         }
       },
       "result": {
-        "equal": "{\"value\":\"value1\",\"id\":\"1\",\"text\":\"a sample text\",\"collection\":[\"item1\",\"item2\",\"item3\"],\"enrichments\":{\"test1\":true}}"
+        "equal": "{\"id\":\"parent\",\"enrichments\":{\"parent\":true}}"
+      }
+    },
+    {
+      "label": "Should add enrichments into an object (item)",
+      "arguments": {
+        "docObject": {
+          "id": "item",
+          "items": [
+            {
+              "value": "item"
+            },
+            {
+              "value": "item"
+            },
+            {
+              "value": "none"
+            }
+          ]
+        }
+      },
+      "result": {
+        "equal": "{\"id\":\"item\",\"items\":[{\"value\":\"item\",\"enrichments\":true},{\"value\":\"item\",\"enrichments\":true},{\"value\":\"none\"}]}"
+      }
+    },
+    {
+      "label": "Should add enrichments into an object (target)",
+      "arguments": {
+        "docObject": {
+          "id": "target",
+          "target": {
+            "key": "test"
+          }
+        }
+      },
+      "result": {
+        "equal": "{\"id\":\"target\",\"target\":{\"key\":\"test\",\"enrichments\":{\"target\":true}}}"
+      }
+    },
+    {
+      "label": "Should add enrichments into an object (root)",
+      "arguments": {
+        "docObject": {
+          "id": "root"
+        }
+      },
+      "result": {
+        "equal": "{\"id\":\"root\",\"enrichments\":{\"root\":true}}"
       }
     },
     {
       "label": "Should not add enrichments into an object",
       "arguments": {
         "docObject": {
-          "value": "fail",
-          "id": "fail",
-          "text": "a sample text",
-          "collection": ["item4", "item5", "item6"]
+          "id": "fail"
         }
       },
       "result": {
-        "equal": "{\"value\":\"fail\",\"id\":\"fail\",\"text\":\"a sample text\",\"collection\":[\"item4\",\"item5\",\"item6\"]}"
+        "equal": "{\"id\":\"fail\"}"
       }
     }
   ]

@@ -13,10 +13,10 @@ const Manager = require("./lib/manager.js"),
 
 const business = {};
 
-business.doTheJob = function(docObject, cb) {
+business.doTheJob = function (docObject, cb) {
   return async.mapSeries(
     conf.datasets,
-    function(item, callback) {
+    function (item, callback) {
       const jsonStream = StreamArray.withParser();
       jsonStream.on("data", ({ key, value }) => {
         Manager.update(docObject, [value]);
@@ -26,7 +26,7 @@ business.doTheJob = function(docObject, cb) {
       });
       return fs.createReadStream(path.resolve(__dirname, item)).pipe(jsonStream.input);
     },
-    function(err) {
+    function (err) {
       return cb();
     }
   );

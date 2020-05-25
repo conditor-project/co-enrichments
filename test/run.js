@@ -22,7 +22,7 @@ const wrapper = {};
  *   - load()
  */
 wrapper.Manager = {
-  update: function(fn, item, cb) {
+  update: function (fn, item, cb) {
     let update = fn(item.arguments.docObject, enrichments);
     return cb(JSON.stringify(item.arguments.docObject));
   }
