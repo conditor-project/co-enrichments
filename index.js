@@ -5,7 +5,7 @@
 
 /* Module Require */
 const Manager = require("./lib/manager.js"),
-  conf = require("./conf.json"),
+  defaultConf = require("./conf.default.json"),
   fs = require("fs"),
   path = require("path"),
   async = require("async"),
@@ -14,6 +14,8 @@ const Manager = require("./lib/manager.js"),
 const business = {};
 
 business.doTheJob = function (docObject, cb) {
+  let conf = defaultConf;
+  if (typeof business.config !== "undefined") Object.assign(conf, business.config);
   return async.mapSeries(
     conf.datasets,
     function (item, callback) {
@@ -24,10 +26,16 @@ business.doTheJob = function (docObject, cb) {
       jsonStream.on("end", () => {
         return callback();
       });
-      return fs.createReadStream(path.resolve(__dirname, item)).pipe(jsonStream.input);
+      let filename = path.resolve(__dirname, item);
+      return fs.stat(filename, function (err, res) {
+        if (err) return callback(err);
+        else if (!res.isFile()) return callback(new Error(filename + " is not a file"));
+        else return fs.createReadStream(filename).pipe(jsonStream.input);
+      });
     },
     function (err) {
-      return cb();
+      if (typeof err !== "undefined" && err) docObject.error = err;
+      return cb(err);
     }
   );
 };
