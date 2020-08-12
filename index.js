@@ -6,38 +6,118 @@
 /* Module Require */
 const Manager = require("./lib/manager.js"),
   defaultConf = require("./conf.default.json"),
-  fs = require("fs"),
-  path = require("path"),
   async = require("async"),
-  StreamArray = require("stream-json/streamers/StreamArray");
+  _ = require("lodash"),
+  mongoose = require("mongoose");
 
 const business = {};
 
-business.doTheJob = function (docObject, cb) {
-  let conf = defaultConf;
+let models = {},
+  db = mongoose.connection,
+  conf = defaultConf,
+  metadata = [];
+
+business.metadataModel = mongoose.model(
+  conf.mongodb.metadata,
+  new mongoose.Schema(
+    {
+      enrichment: String,
+      selectors: Array
+    },
+    { collection: conf.mongodb.metadata }
+  )
+);
+
+business.buildModel = function (collection) {
+  if (typeof models[collection] === "undefined")
+    models[collection] = mongoose.model(
+      collection,
+      new mongoose.Schema(
+        {
+          selectors: Array,
+          target: Object,
+          value: mongoose.Mixed
+        },
+        { collection: collection }
+      )
+    );
+  return models[collection];
+};
+
+business.initialJob = function (cb) {
   if (typeof business.config !== "undefined") Object.assign(conf, business.config);
-  return async.mapSeries(
-    conf.datasets,
+  return mongoose.connect(conf.mongodb.connectUrl, conf.mongodb.connectOpts, function (err) {
+    if (err) console.log(err);
+    return async.mapLimit(
+      conf.enrichments,
+      conf.limit,
+      function (enrichment, callback) {
+        return business.metadataModel.find({ enrichment: enrichment }).exec(function (err, results) {
+          if (err) console.log(err);
+          if (!err && results.length > 0)
+            results.map(function (result) {
+              metadata.push(result);
+            });
+          return callback();
+        });
+      },
+      function (err) {
+        if (err) console.log(err);
+        return cb();
+      }
+    );
+  });
+};
+
+business.doTheJob = function (docObject, cb) {
+  return async.mapLimit(
+    metadata,
+    conf.limit,
     function (item, callback) {
-      const jsonStream = StreamArray.withParser();
-      jsonStream.on("data", ({ key, value }) => {
-        Manager.update(docObject, [value]);
-      });
-      jsonStream.on("end", () => {
-        return callback();
-      });
-      let filename = path.resolve(__dirname, item);
-      return fs.stat(filename, function (err, res) {
-        if (err) return callback(err);
-        else if (!res.isFile()) return callback(new Error(filename + " is not a file"));
-        else return fs.createReadStream(filename).pipe(jsonStream.input);
-      });
+      let model = business.buildModel(item.enrichment),
+        query = {};
+      for (let i = 0; i < item.selectors.length; i++) {
+        let values = Manager.select(item.selectors[i], docObject),
+          data = getData(values);
+        if (data.length > 0) {
+          if (typeof query["selectors.selector"] === "undefined") query["selectors.selector"] = { $in: [] };
+          query["selectors.selector"]["$in"].push(item.selectors[i]);
+          if (typeof query["selectors.values"] === "undefined") query["selectors.values"] = { $in: [] };
+          query["selectors.values"]["$in"].push(data[0]);
+        }
+      }
+      if (Object.keys(query).length > 0)
+        model.find(query).exec(function (err, enrichments) {
+          if (!err && enrichments.length > 0) {
+            Manager.update(docObject, enrichments);
+          }
+          return callback();
+        });
+      else return callback();
     },
     function (err) {
-      if (typeof err !== "undefined" && err) docObject.error = err;
       return cb(err);
     }
   );
 };
+
+business.finalJob = function (docObjects, cb) {
+  db.close();
+  return cb();
+};
+
+function getData(data) {
+  return Array.isArray(data)
+    ? _.reduce(
+        data.map(function (x) {
+          return x.value;
+        })
+      ).map(function (x) {
+        return [x];
+      })
+    : Array.isArray(data.value)
+    ? data.value
+    : [data.value];
+}
 
 module.exports = business;

@@ -1,3 +1,13 @@
 {
-  "datasets": ["datasets/my-file.json"]
+  "enrichments": [{ "collection": "idHal" }],
+  "limit": 5,
+  "mongodb": {
+    "metadata": "_metadata",
+    "connectUrl": "mongodb://localhost:27017/enrichments",
+    "connectOpts": {
+      "useNewUrlParser": true,
+      "useFindAndModify": false,
+      "useUnifiedTopology": true
+    }
+  }
 }

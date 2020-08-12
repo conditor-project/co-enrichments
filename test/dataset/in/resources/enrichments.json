@@ -1,10 +1,11 @@
 [
   {
-    "selectors": {
-      "id": [
-        "parent"
-      ]
-    },
+    "selectors": [
+      {
+        "selector": "id",
+        "values": ["parent"]
+      }
+    ],
     "value": true,
     "target": {
       "from": "parent",
@@ -13,15 +14,18 @@
     }
   },
   {
-    "selectors": {
-      "items": [
-        [
-          {
-            "value": "item"
-          }
+    "selectors": [
+      {
+        "selector": "items",
+        "values": [
+          [
+            {
+              "value": "item"
+            }
+          ]
         ]
-      ]
-    },
+      }
+    ],
     "value": true,
     "target": {
       "from": "item",
@@ -30,13 +34,16 @@
     }
   },
   {
-    "selectors": {
-      "target": [
-        {
-          "key": "test"
-        }
-      ]
-    },
+    "selectors": [
+      {
+        "selector": "target",
+        "values": [
+          {
+            "key": "test"
+          }
+        ]
+      }
+    ],
     "value": true,
     "target": {
       "from": "target",
@@ -45,11 +52,12 @@
     }
   },
   {
-    "selectors": {
-      "id": [
-        "root"
-      ]
-    },
+    "selectors": [
+      {
+        "selector": "id",
+        "values": ["root"]
+      }
+    ],
     "value": true,
     "target": {
       "from": "root",
