@@ -23,7 +23,7 @@ Créer un fichier conf.json (exemple : conf.default.json).
 
 ```json
 {
-  "enrichments": [{ "collection": "idHal" }],
+  "enrichments": [{ "collection": "maCollection" }],
   "limit": 5,
   "mongodb": {
     "metadata": "_metadata",

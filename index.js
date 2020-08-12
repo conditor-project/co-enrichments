@@ -48,11 +48,10 @@ business.initialJob = function (cb) {
   if (typeof business.config !== "undefined") Object.assign(conf, business.config);
   return mongoose.connect(conf.mongodb.connectUrl, conf.mongodb.connectOpts, function (err) {
     if (err) console.log(err);
-    return async.mapLimit(
+    return async.map(
       conf.enrichments,
-      conf.limit,
       function (enrichment, callback) {
-        return business.metadataModel.find({ enrichment: enrichment }).exec(function (err, results) {
+        return business.metadataModel.find({ enrichment: enrichment.collection }).exec(function (err, results) {
           if (err) console.log(err);
           if (!err && results.length > 0)
             results.map(function (result) {
@@ -107,17 +106,20 @@ business.finalJob = function (docObjects, cb) {
 };
 
 function getData(data) {
-  return Array.isArray(data)
-    ? _.reduce(
-        data.map(function (x) {
-          return x.value;
-        })
-      ).map(function (x) {
-        return [x];
+  if (Array.isArray(data)) {
+    let arr = _.reduce(
+      data.map(function (x) {
+        return x.value;
       })
-    : Array.isArray(data.value)
-    ? data.value
-    : [data.value];
+    );
+    return Array.isArray(arr)
+      ? arr.map(function (x) {
+          if (typeof x !== "undefined") return [x];
+        })
+      : [];
+  } else if (typeof data !== "undefined" && typeof data.value !== "undefined")
+    return Array.isArray(data.value) ? data.value : [data.value];
+  else return [];
 }
 
 module.exports = business;
