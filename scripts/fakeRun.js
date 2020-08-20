@@ -19,9 +19,8 @@ business.initialJob(function () {
   jsonStream.on("data", ({ key, value }) => {
     console.log("data");
     if (typeof value === "object") {
-      console.log(JSON.stringify(value));
       return business.doTheJob(value, function () {
-        console.log(JSON.stringify(value));
+        console.log(value.idConditor);
       });
     }
   });
