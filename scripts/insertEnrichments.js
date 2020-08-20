@@ -11,6 +11,7 @@ const StreamArray = require("stream-json/streamers/StreamArray"),
   mongoose = require("mongoose"),
   stream = require("stream"),
   business = require("../index.js"),
+  loader = require("../lib/loader.js"),
   defaultConf = require("../conf.default.json"),
   colors = require("colors/safe");
 
@@ -122,29 +123,6 @@ const db = mongoose.connection,
         });
       }
     );
-  },
-  loader = {
-    start: function (label, count) {
-      const P = [".", "..", "..."];
-      let x = 0;
-      this.label = label;
-      this.count = count;
-      this.interval = setInterval(() => {
-        let str = typeof this.count !== "undefined" ? " (" + this.count + ")" : P[x++];
-        process.stdout.write("\r" + this.label + " ".repeat(str.length + 3));
-        process.stdout.write("\r" + this.label + str);
-        x %= P.length;
-      }, 500);
-    },
-    stop: function (msg = "done.") {
-      let str = typeof this.count !== "undefined" ? "..." + " (" + this.count + ")" : "...";
-      process.stdout.write("\r" + this.label + " ".repeat(str.length + 3));
-      process.stdout.write("\r" + this.label + str + " " + msg + "\n");
-      return clearInterval(this.interval);
-    },
-    refresh: function (count) {
-      this.count = count;
-    }
   },
   stats = {
     display: function (data) {
