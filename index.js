@@ -107,7 +107,7 @@ business.finalJob = function (docObjects, cb) {
 
 function getData(data) {
   if (Array.isArray(data)) {
-    let arr = _.reduce(
+    let arr = _.flatten(
       data.map(function (x) {
         return x.value;
       })
