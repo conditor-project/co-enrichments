@@ -82,7 +82,9 @@ business.doTheJob = function (docObject, cb) {
           if (typeof query["selectors.selector"] === "undefined") query["selectors.selector"] = { $in: [] };
           query["selectors.selector"]["$in"].push(item.selectors[i]);
           if (typeof query["selectors.values"] === "undefined") query["selectors.values"] = { $in: [] };
-          query["selectors.values"]["$in"].push(data[0]);
+          data.map(function (item) {
+            query["selectors.values"]["$in"].push(item);
+          });
         }
       }
       if (Object.keys(query).length > 0)
