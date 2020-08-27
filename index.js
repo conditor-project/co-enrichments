@@ -10,6 +10,13 @@ const Manager = require("./lib/manager.js"),
   _ = require("lodash"),
   mongoose = require("mongoose");
 
+const elasticsearch = require("elasticsearch"),
+  elasticsearchConf = require("co-config/es.js"),
+  mapping = require("co-config/mapping.json"),
+  elasticsearchClient = new elasticsearch.Client({
+    host: elasticsearchConf.host
+  });
+
 const business = {};
 
 let models = {},
@@ -97,7 +104,22 @@ business.doTheJob = function (docObject, cb) {
       else return callback();
     },
     function (err) {
-      return cb(err);
+      return elasticsearchClient
+        .update({
+          index: elasticsearchConf.index,
+          type: Object.keys(mapping.mappings).pop(),
+          id: docObject.idElasticsearch,
+          body: {
+            doc: docObject
+          }
+        })
+        .then(() => {
+          return cb();
+        })
+        .catch((error) => {
+          docObject.error = error;
+          return cb(error);
+        });
     }
   );
 };
