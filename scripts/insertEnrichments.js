@@ -21,7 +21,7 @@ program
   .requiredOption("--collection <collection>", colors.yellow(colors.bold("required")) + "   name of mongodb collection")
   .option(
     "--connectUrl <connectUrl>",
-    colors.gray(colors.bold("optionnal")) + "   mongoDB Url",
+    colors.gray(colors.bold("optionnal")) + "  mongoDB Url",
     defaultConf.mongodb.connectUrl
   )
   .option(
