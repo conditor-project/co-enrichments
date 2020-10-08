@@ -20,6 +20,9 @@ business.initialJob(function () {
     console.log("data");
     if (typeof value === "object") {
       return business.doTheJob(value, function () {
+        value.authors.map(function (item) {
+          console.log(item.enrichments);
+        });
         console.log(value.idConditor);
       });
     }
