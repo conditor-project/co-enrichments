@@ -95,7 +95,7 @@ business.doTheJob = function (docObject, cb) {
         }
       }
       if (Object.keys(query).length > 0)
-        model.find(query).exec(function (err, enrichments) {
+        return model.find(query).exec(function (err, enrichments) {
           if (!err && enrichments.length > 0) {
             Manager.update(docObject, enrichments);
           }
@@ -141,8 +141,7 @@ function getData(data) {
           if (typeof x !== "undefined") return [x];
         })
       : [];
-  } else if (typeof data !== "undefined" && typeof data.value !== "undefined")
-    return Array.isArray(data.value) ? data.value : [data.value];
+  } else if (typeof data !== "undefined" && typeof data.value !== "undefined") return [data.value];
   else return [];
 }
 
