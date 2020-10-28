@@ -57,7 +57,9 @@ Un script ([scripts/insertEnrichments.js](scripts/insertEnrichments.js)) permet 
 
 * **--input** : Nom du fichier d'enrichissement
 * **--collection** : Nom de la collection où seront ajoutés les enrichissements
-* **--deduplicate** : Dédoublonne les enrichissements*
+* **--connectUrl** : Url d'accès à la base MongoDB
+* **--deduplicate** : Dédoublonne les enrichissements* : permet de ne pas avoir deux fois le même enrichissment (égalité strict)
+* **--merge** : Merge les données d'enrichissements* : fusionne les données d'enrichissments (value) partageant le(s) même(s) sélecteur(s) (selectors)
 * **--limit** : Nombre d'enrichissements traités en parallèle
 
 *Dédoublonnage simple, recherche d'égalité stricte.
@@ -69,9 +71,12 @@ Usage: insertEnrichments [options]
 Options:
   --input <input>            required   input file
   --collection <collection>  required   name of mongodb collection
+  --connectUrl <connectUrl>  optionnal  mongoDB Url (default: "mongodb://localhost:27017/enrichments")
   --deduplicate              optionnal  deduplicate enrichment(s). It will force --limit value to 1 (& increase processing times)
+  --merge                    optionnal  merge enrichment(s) with same selectors. It will force --limit value to 1 (& increase processing times)
   --limit <limit>            optionnal  max number of enrichments in queue (default: 1)
   -h, --help                 display help for command
+
 ```
 
 ##### Insertion sans dédoublonnage #####
